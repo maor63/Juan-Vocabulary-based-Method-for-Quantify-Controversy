@@ -1,0 +1,32 @@
+#!/bin/bash
+declare -a scores
+scores=()
+#for i in {1..10}
+#do
+
+for name in area51 bigil bolsonaro27 bolsonaro28 bolsonaro30 germanwings halsey impeachment-5-10 kavanaugh02-05 kavanaugh06-08 kavanaugh16 kingjacksonday lula_moro_chats macri-05-11abril macri-1-10enero macri-11-18marzo macri-20-27marzo macri05-11mayo messicumple mothersday nepal netanyahu nintendo notredam onedirection sxsw ukraine ultralive VanduMuruganAJITH wrestlemania
+#for name in bigil
+do
+  echo $name
+  
+  Rscript craete_datasets_train_predict.R $name
+  
+  #python train_fasttext.py $name
+  
+  ./fasttext supervised -input datasets/fasttext_train_predict_files/$name-train.txt -output datasets/fasttext_train_predict_files/$name -dim 200 -wordNgrams 2 -ws 5 -epoch 20
+
+  ./fasttext predict-prob datasets/fasttext_train_predict_files/$name.bin datasets/fasttext_train_predict_files/$name-to-predict.txt > datasets/fasttext_train_predict_files/$name.csv
+  
+  rm datasets/fasttext_train_predict_files/$name.bin
+  rm datasets/fasttext_train_predict_files/$name.vec
+  
+  Rscript to_python.R $name
+  
+  scores+=($(python score.py $name))
+  
+  #done
+  echo "Scores"
+  printf '%s \n' "${scores[@]}"
+done
+
+

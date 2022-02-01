@@ -1,0 +1,24 @@
+#!/bin/bash
+declare -a scores
+scores=()
+#  bolsonaro28 area51
+for name in area51 bigil bolsonaro27 bolsonaro28 bolsonaro30 germanwings halsey impeachment-5-10 kavanaugh02-05 kavanaugh06-08 kavanaugh16 kingjacksonday lula_moro_chats macri-05-11abril macri-1-10enero macri-11-18marzo macri-20-27marzo macri05-11mayo messicumple mothersday nepal netanyahu nintendo notredam onedirection sxsw ukraine ultralive VanduMuruganAJITH wrestlemania
+do
+  echo $name
+  Rscript create_txt.R $name
+  echo "calculate fasttext embeddings"
+  ./fasttext supervised -input datasets/fasttext_sentence_embeddings/$name-train.txt -output datasets/fasttext_sentence_embeddings/$name -dim 200 -wordNgrams 2 -ws 5 
+  ./fasttext print-sentence-vectors datasets/fasttext_sentence_embeddings/$name.bin < datasets/fasttext_sentence_embeddings/$name-C1.txt > datasets/fasttext_sentence_embeddings/$name-C1-vec.txt
+  ./fasttext print-sentence-vectors datasets/fasttext_sentence_embeddings/$name.bin < datasets/fasttext_sentence_embeddings/$name-C2.txt > datasets/fasttext_sentence_embeddings/$name-C2-vec.txt
+  
+  rm datasets/fasttext_sentence_embeddings/$name.bin
+  rm datasets/fasttext_sentence_embeddings/$name.vec
+  
+  #echo "calculate BERT embeddings"
+  #python communities_BERT_embeddings.py $name
+  
+  #scores+=($(python score_nlp.py datasets/bert_sentence_embeddings/$name))
+  scores+=($(python score_nlp.py datasets/fasttext_sentence_embeddings/$name))
+  echo "Scores"
+  printf '%s \n' "${scores[@]}"
+done

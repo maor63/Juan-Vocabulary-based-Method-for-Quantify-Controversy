@@ -1,0 +1,21 @@
+#!/bin/bash
+declare -a scores
+scores=()
+#for i in {1..10}
+#do
+
+Rscript craete_datasets_train_predict.R $1
+
+#./fasttext supervised -input $1-train.txt -output $1 -dim 200 -wordNgrams 2 -ws 5 -epoch 20
+
+#./fasttext predict-prob $1.bin $1-to-predict.txt > $1.csv
+
+python train_fasttext.py $1
+
+Rscript to_python.R $1
+
+scores+=($(python score.py $1))
+
+#done
+echo "Scores"
+printf '%s \n' "${scores[@]}"

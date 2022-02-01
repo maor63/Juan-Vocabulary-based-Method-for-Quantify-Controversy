@@ -1,0 +1,1 @@
+bert-serving-start -pooling_strategy CLS_TOKEN -model_dir=bert/ -tuned_model_dir=bert/ -ckpt_name=bert_model.ckpt -max_seq_len 150

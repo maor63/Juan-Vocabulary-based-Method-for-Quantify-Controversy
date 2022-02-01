@@ -1,0 +1,14 @@
+#!/bin/bash
+declare -a scores
+scores=()
+Rscript create_txt.R $1
+./fasttext supervised -input datasets/fasttext_sentence_embeddings/$1-train.txt -output datasets/fasttext_sentence_embeddings/$1 -dim 200 -wordNgrams 2 -ws 5 
+./fasttext print-sentence-vectors datasets/fasttext_sentence_embeddings/$1.bin < datasets/fasttext_sentence_embeddings/$1-C1.txt > datasets/fasttext_sentence_embeddings/$1-C1-vec.txt
+./fasttext print-sentence-vectors datasets/fasttext_sentence_embeddings/$1.bin < datasets/fasttext_sentence_embeddings/$1-C2.txt > datasets/fasttext_sentence_embeddings/$1-C2-vec.txt
+
+rm datasets/fasttext_sentence_embeddings/$1.bin
+rm datasets/fasttext_sentence_embeddings/$1.vec
+
+scores+=($(python score_nlp.py datasets/fasttext_sentence_embeddings/$1))
+echo "Scores"
+printf '%s \n' "${scores[@]}"
